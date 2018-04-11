@@ -33,7 +33,7 @@ class TestUserService(BaseTestCase):
                     'username': 'test',
                     'email': 'test@test.das'
                 }),
-               content_type='application/json'
+                content_type='application/json'
             )
             data = json.loads(response.data.decode())
             self.assertEqual(response.status_code, 201)
