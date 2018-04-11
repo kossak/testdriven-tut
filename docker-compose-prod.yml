@@ -1,0 +1,41 @@
+version: '3.2'
+
+services:
+
+  users-prod:
+    container_name: users-prod
+    build:
+      context: ./services/users
+      dockerfile: Dockerfile-prod
+#    volumes:
+#      - './services/users:/usr/src/app'
+    ports:
+      - 5000
+    environment:
+      - DATABASE_URL=postgres://postgres:postgres@users-db:5432/users_prod
+      - DATABASE_TEST_URL=postgres://postgres:postgres@users-db:5432/users_test
+      - APP_SETTINGS=project.config.ProductionConfig
+    depends_on:
+      - users-db-prod
+    links:
+      - users-db-prod
+
+  users-db-prod:
+    container_name: users-db-prod
+    build:
+      context: ./services/users/project/db
+      dockerfile: Dockerfile
+    ports:
+      - 5436:5432
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+
+  nginx:
+    container_name: nginx
+    build: ./services/nginx
+    restart: always
+    ports:
+      - 80:80
+    depends_on:
+      - users-prod
